@@ -1,0 +1,182 @@
+{
+  "evolucion_diaria": {
+    "descripcion": "Vistas, tiempo de reproducción y suscriptores día a día",
+    "peticion": {
+      "ids": "channel==GOLAZO_CHANNEL_ID_SIMULADO",
+      "startDate": "2026-08-01",
+      "endDate": "2026-08-31",
+      "metrics": "views,estimatedMinutesWatched,averageViewDuration,subscribersGained,subscribersLost",
+      "dimensions": "day"
+    },
+    "forma_respuesta": {
+      "kind": "youtubeAnalytics#resultTable",
+      "columnHeaders": [
+        {
+          "name": "day",
+          "columnType": "DIMENSION",
+          "dataType": "STRING"
+        },
+        {
+          "name": "views",
+          "columnType": "METRIC",
+          "dataType": "INTEGER"
+        },
+        {
+          "name": "estimatedMinutesWatched",
+          "columnType": "METRIC",
+          "dataType": "INTEGER"
+        },
+        {
+          "name": "averageViewDuration",
+          "columnType": "METRIC",
+          "dataType": "FLOAT"
+        },
+        {
+          "name": "subscribersGained",
+          "columnType": "METRIC",
+          "dataType": "INTEGER"
+        },
+        {
+          "name": "subscribersLost",
+          "columnType": "METRIC",
+          "dataType": "INTEGER"
+        }
+      ],
+      "rows": []
+    }
+  },
+  "retencion_audiencia": {
+    "descripcion": "Curva de retención de audiencia por vídeo",
+    "peticion": {
+      "ids": "channel==GOLAZO_CHANNEL_ID_SIMULADO",
+      "startDate": "2026-08-01",
+      "endDate": "2026-08-31",
+      "metrics": "audienceWatchRatio,relativeRetentionPerformance",
+      "dimensions": "elapsedVideoTimeRatio"
+    },
+    "forma_respuesta": {
+      "kind": "youtubeAnalytics#resultTable",
+      "columnHeaders": [
+        {
+          "name": "elapsedVideoTimeRatio",
+          "columnType": "DIMENSION",
+          "dataType": "STRING"
+        },
+        {
+          "name": "audienceWatchRatio",
+          "columnType": "METRIC",
+          "dataType": "FLOAT"
+        },
+        {
+          "name": "relativeRetentionPerformance",
+          "columnType": "METRIC",
+          "dataType": "FLOAT"
+        }
+      ],
+      "rows": []
+    }
+  },
+  "demografia": {
+    "descripcion": "Reparto de la audiencia por edad y género",
+    "peticion": {
+      "ids": "channel==GOLAZO_CHANNEL_ID_SIMULADO",
+      "startDate": "2026-08-01",
+      "endDate": "2026-08-31",
+      "metrics": "viewerPercentage",
+      "dimensions": "ageGroup,gender"
+    },
+    "forma_respuesta": {
+      "kind": "youtubeAnalytics#resultTable",
+      "columnHeaders": [
+        {
+          "name": "ageGroup",
+          "columnType": "DIMENSION",
+          "dataType": "STRING"
+        },
+        {
+          "name": "gender",
+          "columnType": "DIMENSION",
+          "dataType": "STRING"
+        },
+        {
+          "name": "viewerPercentage",
+          "columnType": "METRIC",
+          "dataType": "FLOAT"
+        }
+      ],
+      "rows": []
+    }
+  },
+  "trafico": {
+    "descripcion": "Fuentes de tráfico que generan vistas",
+    "peticion": {
+      "ids": "channel==GOLAZO_CHANNEL_ID_SIMULADO",
+      "startDate": "2026-08-01",
+      "endDate": "2026-08-31",
+      "metrics": "views,estimatedMinutesWatched",
+      "dimensions": "insightTrafficSourceType"
+    },
+    "forma_respuesta": {
+      "kind": "youtubeAnalytics#resultTable",
+      "columnHeaders": [
+        {
+          "name": "insightTrafficSourceType",
+          "columnType": "DIMENSION",
+          "dataType": "STRING"
+        },
+        {
+          "name": "views",
+          "columnType": "METRIC",
+          "dataType": "INTEGER"
+        },
+        {
+          "name": "estimatedMinutesWatched",
+          "columnType": "METRIC",
+          "dataType": "INTEGER"
+        }
+      ],
+      "rows": []
+    }
+  },
+  "ingresos": {
+    "descripcion": "Ingresos estimados día a día",
+    "peticion": {
+      "ids": "channel==GOLAZO_CHANNEL_ID_SIMULADO",
+      "startDate": "2026-08-01",
+      "endDate": "2026-08-31",
+      "metrics": "estimatedRevenue,estimatedAdRevenue,cpm,playbackBasedCpm",
+      "dimensions": "day"
+    },
+    "forma_respuesta": {
+      "kind": "youtubeAnalytics#resultTable",
+      "columnHeaders": [
+        {
+          "name": "day",
+          "columnType": "DIMENSION",
+          "dataType": "STRING"
+        },
+        {
+          "name": "estimatedRevenue",
+          "columnType": "METRIC",
+          "dataType": "FLOAT"
+        },
+        {
+          "name": "estimatedAdRevenue",
+          "columnType": "METRIC",
+          "dataType": "FLOAT"
+        },
+        {
+          "name": "cpm",
+          "columnType": "METRIC",
+          "dataType": "FLOAT"
+        },
+        {
+          "name": "playbackBasedCpm",
+          "columnType": "METRIC",
+          "dataType": "FLOAT"
+        }
+      ],
+      "rows": []
+    }
+  }
+}

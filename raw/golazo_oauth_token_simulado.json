@@ -1,0 +1,19 @@
+{
+  "token_type": "Bearer",
+  "access_token": "SIMULADO_a389c430cef7c5e4ff2701c5e577e698",
+  "refresh_token": "SIMULADO_REFRESH_8ab0d9a76ea3c0d74e835230d10108d7",
+  "expires_in": 3599,
+  "expiry": "2026-09-12T17:38:57.498978+00:00",
+  "scopes_concedidos": [
+    "https://www.googleapis.com/auth/yt-analytics.readonly",
+    "https://www.googleapis.com/auth/yt-analytics-monetary.readonly",
+    "https://www.googleapis.com/auth/youtube.readonly"
+  ],
+  "canal_autorizado": {
+    "channel_id": "GOLAZO_CHANNEL_ID_SIMULADO",
+    "channel_title": "Golazo",
+    "rol_concedido": "Analista"
+  },
+  "fecha_simulacion": "2026-09-12T16:38:58.498978+00:00",
+  "nota": "Token SIMULADO para el proyecto académico GrowUP. En un caso real, este JSON lo generaría google-auth-oauthlib tras el consentimiento explícito del propietario del canal, y access_token/refresh_token serían valores reales emitidos por Google, nunca visibles ni compartidos como contraseña."
+}
