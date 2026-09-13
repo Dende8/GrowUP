@@ -68,26 +68,54 @@ def cargar_videos_purobalompie() -> pd.DataFrame:
     )
 
 
+def cargar_estadisticas_canal_purobalompie() -> dict:
+    """
+    Carga las estadísticas públicas del canal (suscriptores incluidos),
+    extraídas en la Fase 2 con channels.list.
+    """
+    ruta = os.path.join(RAW_DIR, "purobalompie_channel.json")
+    with open(ruta, encoding="utf-8") as f:
+        canal = json.load(f)
+    return {
+        "suscriptores": int(canal["statistics"]["subscriberCount"]),
+    }
+
+
 def resumen_patrones(df: pd.DataFrame) -> dict:
     """
     Reduce el DataFrame real de PuroBalompie a un puñado de patrones
-    reutilizables: no copiamos sus cifras absolutas (su canal es de
-    otra escala), sino RATIOS y FORMAS de distribución que sí son
-    transferibles a un canal de fútbol más pequeño como Golazo.
+    reutilizables: no copiamos sus cifras absolutas de vistas tal
+    cual (su canal es de otra escala), pero SÍ guardamos su
+    distribución completa de vistas (para hacer bootstrap) junto con
+    sus suscriptores reales, de forma que se pueda reescalar por
+    RATIO DE SUSCRIPTORES en vez de por el vídeo más viral del canal
+    (que sería muy sensible a un único outlier).
     """
     df = df.sort_values("fecha_publicacion")
     intervalos_dias = df["fecha_publicacion"].diff().dt.days.dropna()
+    stats_canal = cargar_estadisticas_canal_purobalompie()
+
+    # Winsorización: capamos las vistas al percentil 90 antes de
+    # guardarlas para el bootstrap. Sin esto, un único vídeo viral
+    # puntual de la muestra real puede "clonarse" varias veces al
+    # remuestrear con reemplazo (más probable cuanto más pequeña es
+    # la muestra real), generando decenas de falsos vídeos virales
+    # sintéticos que no reflejan un patrón real del canal.
+    limite_p90 = df["views"].quantile(0.90)
+    views_capadas = df["views"].clip(upper=limite_p90)
 
     return {
         "duracion_media_seg": float(df["duracion_segundos"].mean()),
         "duracion_std_seg": float(df["duracion_segundos"].std()),
+        "duraciones_absolutas": df["duracion_segundos"].tolist(),
         "ratio_likes_por_vista": float((df["likes"] / df["views"]).median()),
         "ratio_comentarios_por_vista": float((df["comentarios"] / df["views"]).median()),
         "intervalo_publicacion_dias_mediana": float(intervalos_dias.median()),
-        # Forma relativa de la distribución de vistas (normalizada 0-1
-        # sobre la vista máxima del canal), para poder "re-escalarla"
-        # al tamaño de audiencia de Golazo sin copiar cifras absolutas.
-        "views_normalizadas": (df["views"] / df["views"].max()).tolist(),
+        "suscriptores": stats_canal["suscriptores"],
+        # Vistas ABSOLUTAS reales (capadas al p90) para hacer
+        # bootstrap conservando la forma de la distribución sin dejar
+        # que un único outlier domine el remuestreo.
+        "views_absolutas": views_capadas.tolist(),
     }
 
 
@@ -96,5 +124,6 @@ if __name__ == "__main__":
     patrones = resumen_patrones(df)
     print(f"Vídeos reales cargados de PuroBalompie: {len(df)}")
     for k, v in patrones.items():
-        if k != "views_normalizadas":
-            print(f"  {k}: {v:.4f}" if isinstance(v, float) else f"  {k}: {v}")
+        if k == "views_absolutas":
+            continue
+        print(f"  {k}: {v:.4f}" if isinstance(v, float) else f"  {k}: {v}")

@@ -102,23 +102,29 @@ def generar_catalogo_videos(patrones: dict) -> pd.DataFrame:
         k=GOLAZO_TOTAL_VIDEOS,
     )
 
-    # Factor de escala: Golazo es un canal mucho más pequeño que
-    # PuroBalompie. Usamos un factor conservador y documentado en vez
-    # de inventarlo sin criterio: escalamos la forma normalizada de
-    # vistas de PuroBalompie a un rango de vistas por vídeo coherente
-    # con un canal de 14k suscriptores (cientos a pocos miles de
-    # vistas por vídeo, con algunos picos virales).
-    vistas_normalizadas_base = patrones["views_normalizadas"]
+    # Factor de escala: ratio de SUSCRIPTORES entre Golazo y
+    # PuroBalompie. Es una escala estable (no depende de un único
+    # vídeo viral, a diferencia de normalizar contra el máximo de
+    # vistas, que quedó demostrado como sensible a outliers y
+    # apelmazaba demasiados vídeos en el suelo mínimo).
+    escala = GOLAZO_SUSCRIPTORES_ACTUALES / patrones["suscriptores"]
+    views_reales_purobalompie = patrones["views_absolutas"]
 
     filas = []
     for i, (fecha, categoria) in enumerate(zip(fechas, categorias)):
-        forma = random.choice(vistas_normalizadas_base)
-        views = max(150, int(forma * 9000 + random.gauss(0, 300)))
+        # Bootstrap: remuestreamos un vídeo real completo (conservando
+        # toda la forma de la distribución real, no solo su máximo) y
+        # lo reescalamos al tamaño de audiencia de Golazo.
+        views_base_real = random.choice(views_reales_purobalompie)
+        views = max(80, round(views_base_real * escala * random.uniform(0.7, 1.4)))
 
-        duracion = max(
-            90,
-            int(random.gauss(patrones["duracion_media_seg"], patrones["duracion_std_seg"]))
-        )
+        # Bootstrap también en duración (no gaussiana con suelo forzado):
+        # la duración real de vídeos de fútbol no es simétrica (mezcla
+        # de resúmenes cortos y análisis largos), así que una normal
+        # con suelo apelmazaba demasiados vídeos en el mínimo, igual
+        # que pasaba antes con las vistas.
+        duracion_base_real = random.choice(patrones["duraciones_absolutas"])
+        duracion = max(60, round(duracion_base_real * random.uniform(0.85, 1.15)))
         likes = max(0, int(views * patrones["ratio_likes_por_vista"] * random.uniform(0.7, 1.3)))
         comentarios = max(0, int(views * patrones["ratio_comentarios_por_vista"] * random.uniform(0.5, 1.5)))
 
@@ -201,19 +207,17 @@ def generar_informe_evolucion_diaria() -> dict:
     return forma
 
 
-def generar_informe_retencion(df_videos: pd.DataFrame, n_muestra: int = 15) -> dict:
+def generar_informe_retencion(df_videos: pd.DataFrame) -> dict:
     """
-    Genera una curva de retención sintética por vídeo (para una
-    muestra de vídeos, no los 338) siguiendo la forma típica real de
+    Genera una curva de retención sintética para TODOS los vídeos del
+    catálogo (no una muestra), siguiendo la forma típica real de
     YouTube: caída fuerte en los primeros segundos, descenso más
     suave después, y ligero repunte al final (efecto end screen).
     """
     puntos = [round(x / 20, 2) for x in range(21)]  # 0.00, 0.05, ..., 1.00
     rows = []
 
-    muestra = df_videos.sample(n=min(n_muestra, len(df_videos)), random_state=42)
-
-    for _, video in muestra.iterrows():
+    for _, video in df_videos.iterrows():
         caida_inicial = random.uniform(0.35, 0.55)  # % que se pierde en el primer 5%
         for punto in puntos:
             if punto <= 0.05:
@@ -352,7 +356,7 @@ def main():
     print(f"  -> Suma views generadas: {suma_views} (real: {GOLAZO_VISTAS_30D})")
     print(f"  -> Suma suscriptores generados: {suma_subs} (real: {GOLAZO_SUSCRIPTORES_GANADOS_30D})")
 
-    print("Generando informe de retención de audiencia (muestra de vídeos)...")
+    print("Generando informe de retención de audiencia (los 338 vídeos, sin muestreo)...")
     retencion = generar_informe_retencion(df_catalogo)
 
     print("Generando informe de demografía...")
