@@ -254,7 +254,9 @@ def generar_informe_demografia() -> dict:
         ("65-", "male"): 1, ("65-", "female"): 0,
     }
     # Pequeño ruido manteniendo la suma en 100
-    ruido = {k: v + random.uniform(-1, 1) for k, v in distribucion.items()}
+    # max(0.1, ...) evita que una categoría ya pequeña (p. ej. "65-"
+    # con base 0 o 1) se vuelva negativa al restarle ruido aleatorio.
+    ruido = {k: max(0.1, v + random.uniform(-1, 1)) for k, v in distribucion.items()}
     total = sum(ruido.values())
     normalizado = {k: round(v / total * 100, 2) for k, v in ruido.items()}
 
